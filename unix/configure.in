@@ -1,17 +1,18 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(../include/mk4.h)
-AC_PREREQ(2.5)
+AC_INIT
+AC_CONFIG_SRCDIR([../include/mk4.h])
+AC_PREREQ([2.71])
 AC_CONFIG_AUX_DIR(scripts)
-AC_CONFIG_HEADER(config.h)
-AC_LANG_CPLUSPLUS
+AC_CONFIG_HEADERS([config.h])
+AC_LANG([C++])
 
 MK_TARGETS="core"
 MK_INSTALL="install-mk"
 
 AC_ARG_WITH(python,
 [  --with-python=PATH      build the Mk4py extension for Python with headers in
-                          `PATH/include/python2.5'; install the Mk4py modules in
-                          `PATH/lib/python2.5/site-packages'.  If PATH is of the
+                          `PATH/include/python3.7m'; install the Mk4py modules in
+                          `PATH/lib/python3.7/site-packages'.  If PATH is of the
                           form `HEADER,LIB', search for header files in HEADER,
                           and install Mk4py in LIB.  If you omit the `=PATH'
                           part, use the standard includedir and libdir.],
@@ -20,8 +21,8 @@ AC_ARG_WITH(python,
 AC_MSG_CHECKING([for Python configuration])
 case "$with_python" in
   "yes" )
-	PY_INCLUDE_DIR="${prefix}/include/python2.5"
-	PY_LIB_DIR="${prefix}/lib/python2.5/site-packages"
+	PY_INCLUDE_DIR="${prefix}/include/python3.7m"
+	PY_LIB_DIR="${prefix}/lib/python3.7/site-packages"
   ;;
   "no" )
 	PY_INCLUDE_DIR="# no Python headers"
@@ -31,8 +32,8 @@ case "$with_python" in
 	PY_LIB_DIR="`echo $with_python | sed -e 's/^.*,//'`"
   ;;
   * )
-    PY_INCLUDE_DIR="$with_python/include/python2.5"
-    PY_LIB_DIR="$with_python/lib/python2.5/site-packages"
+    PY_INCLUDE_DIR="$with_python/include/python3.7m"
+    PY_LIB_DIR="$with_python/lib/python3.7/site-packages"
   ;;
 esac
 
@@ -131,7 +132,15 @@ AC_PROG_INSTALL
 # Checks for libraries.
 
 # Checks for header files.
-AC_HEADER_STDC
+m4_warn([obsolete],
+[The preprocessor macro `STDC_HEADERS' is obsolete.
+  Except in unusual embedded environments, you can safely include all
+  ISO C90 headers unconditionally.])dnl
+# Autoupdate added the next two lines to ensure that your configure
+# script's behavior did not change.  They are probably safe to remove.
+AC_CHECK_INCLUDES_DEFAULT
+AC_PROG_EGREP
+
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -293,4 +302,5 @@ AC_SUBST(SHLIB_LD)
 AC_SUBST(SHLIB_FLAGS)
 AC_SUBST(STRIP_FLAGS)
 
-AC_OUTPUT(Makefile)
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
