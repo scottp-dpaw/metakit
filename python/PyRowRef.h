@@ -14,12 +14,12 @@
 #include "PyView.h"
 #include "PyProperty.h"
 
-#define PyRowRef_Check(ob) ((ob)->ob_type == &PyRowReftype)
-#define PyRORowRef_Check(ob) ((ob)->ob_type == &PyRORowReftype)
+#define PyRowRef_Check(ob) ((ob)->ob_type == &PyRowRef_Type)
+#define PyRORowRef_Check(ob) ((ob)->ob_type == &PyRORowRef_Type)
 #define PyGenericRowRef_Check(ob) (PyRowRef_Check(ob) || PyRORowRef_Check(ob))
 
-extern PyTypeObject PyRowReftype;
-extern PyTypeObject PyRORowReftype;
+extern PyTypeObject PyRowRef_Type;
+extern PyTypeObject PyRORowRef_Type;
 
 class PyRowRef: public PyHead, public c4_RowRef {
   public:

@@ -19,7 +19,7 @@
 #define __declspec(x)
 #endif 
 
-static char mk4py_module_documentation[] = 
+static const char mk4py_module_documentation[] = 
   "This is the Python interface of the embeddable MetaKit database library.\n"
   "Example of use:\n""\n""  import Mk4py\n""  mk = Mk4py\n""\n"
   "  s = mk.storage('demo.dat', 1)\n"
@@ -48,9 +48,12 @@ c4_PyStream::c4_PyStream(PyObject *stream_): _stream(stream_){}
 
 int c4_PyStream::Read(void *buffer_, int length_) {
   PyObject *o = PyObject_CallMethod(_stream, "read", "i", length_);
-  int n = o != 0 ? PyString_Size(o): 0;
+  if (!o)
+    return 0;
+  Py_ssize_t n = 0;
+  const char *temp = PyUnicode_AsUTF8AndSize(o, &n);
   if (n > 0)
-    memcpy(buffer_, PyString_AsString(o), n);
+    memcpy(buffer_, temp, n);
   return n;
 }
 
@@ -126,7 +129,7 @@ class SiasStrategy: public c4_Strategy {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static char *autocommit__doc = 
+static const char *autocommit__doc = 
   "autocommit() -- turn on autocommit (i.e. commit when storage object is deleted)";
 
 static PyObject *PyStorage_Autocommit(PyStorage *o, PyObject *_args) {
@@ -139,7 +142,7 @@ static PyObject *PyStorage_Autocommit(PyStorage *o, PyObject *_args) {
   }
 }
 
-static char *contents__doc = 
+static const char *contents__doc = 
   "contents() -- return view with one row, representing entire storage (internal use)";
 
 static PyObject *PyStorage_Contents(PyStorage *o, PyObject *_args) {
@@ -150,7 +153,7 @@ static PyObject *PyStorage_Contents(PyStorage *o, PyObject *_args) {
   }
 }
 
-static char *description__doc = 
+static const char *description__doc = 
   "description(name='') -- return a description of named view, or of entire storage";
 
 static PyObject *PyStorage_Description(PyStorage *o, PyObject *_args) {
@@ -169,7 +172,7 @@ static PyObject *PyStorage_Description(PyStorage *o, PyObject *_args) {
   return 0; /* satisfy compiler */
 }
 
-static char *commit__doc = 
+static const char *commit__doc = 
   "commit(full=0) -- permanently commit data and structure changes to disk";
 
 static PyObject *PyStorage_Commit(PyStorage *o, PyObject *_args) {
@@ -187,7 +190,7 @@ static PyObject *PyStorage_Commit(PyStorage *o, PyObject *_args) {
   }
 }
 
-static char *rollback__doc = 
+static const char *rollback__doc = 
   "rollback(full=0) -- revert data and structure as was last committed to disk";
 
 static PyObject *PyStorage_Rollback(PyStorage *o, PyObject *_args) {
@@ -205,7 +208,7 @@ static PyObject *PyStorage_Rollback(PyStorage *o, PyObject *_args) {
   }
 }
 
-static char *aside__doc = 
+static const char *aside__doc = 
   "aside() -- revert data and structure as was last committed to disk";
 
 static PyObject *PyStorage_Aside(PyStorage *o, PyObject *_args) {
@@ -223,7 +226,7 @@ static PyObject *PyStorage_Aside(PyStorage *o, PyObject *_args) {
   }
 }
 
-static char *view__doc = 
+static const char *view__doc = 
   "view(viewname) -- return top-level view in storage, given its name";
 
 static PyObject *PyStorage_View(PyStorage *o, PyObject *_args) {
@@ -236,7 +239,7 @@ static PyObject *PyStorage_View(PyStorage *o, PyObject *_args) {
   }
 }
 
-static char *getas__doc = 
+static const char *getas__doc = 
   "getas(description) -- return view, create / restructure as needed to match";
 
 static PyObject *PyStorage_GetAs(PyStorage *o, PyObject *_args) {
@@ -249,7 +252,7 @@ static PyObject *PyStorage_GetAs(PyStorage *o, PyObject *_args) {
   }
 }
 
-static char *load__doc = 
+static const char *load__doc = 
   "load(file) -- replace storage object contents from file (or any obj supporting read)";
 
 static PyObject *PyStorage_load(PyStorage *o, PyObject *_args) {
@@ -268,7 +271,7 @@ static PyObject *PyStorage_load(PyStorage *o, PyObject *_args) {
   }
 }
 
-static char *save__doc = 
+static const char *save__doc = 
   "save(file) -- store storage object contents to file (or any obj supporting write)";
 
 static PyObject *PyStorage_save(PyStorage *o, PyObject *_args) {
@@ -335,25 +338,18 @@ static int PyStorage_print(PyStorage *o, FILE *f, int) {
   return 0;
 }
 
-static PyObject *PyStorage_getattr(PyStorage *o, char *nm) {
-  return Py_FindMethod(StorageMethods, o, nm);
-}
-
-PyTypeObject PyStoragetype =  {
-  PyObject_HEAD_INIT(&PyType_Type)0, "PyStorage", sizeof(PyStorage), 0, 
-    (destructor)PyStorage_dealloc,  /*tp_dealloc*/
-  (printfunc)PyStorage_print,  /*tp_print*/
-  (getattrfunc)PyStorage_getattr,  /*tp_getattr*/
-  0,  /*tp_setattr*/
-  (cmpfunc)0,  /*tp_compare*/
-  (reprfunc)0,  /*tp_repr*/
-  0,  /*tp_as_number*/
-  0,  /*tp_as_sequence*/
-  0,  /*tp_as_mapping*/
+PyTypeObject PyStorage_Type =  {
+  .ob_base = PyObject_HEAD_INIT(&PyType_Type)
+  .tp_name = "PyStorage",
+  .tp_basicsize = sizeof(PyStorage),
+  .tp_itemsize = 0,
+  .tp_dealloc = (destructor)PyStorage_dealloc,
+  .tp_print = (printfunc)PyStorage_print,
+  .tp_methods = StorageMethods,
 };
 
-static char *storage__doc = 
-  "storage() -- create a new in-memory storage (can load/save, but not commit/rollback)\n""storage(file) -- attach a storage object to manage an already opened stdio file\n""storage(filename, rw) -- open file, rw=0: r/o, rw=1: r/w, rw=2: extend";
+static const char *storage__doc = 
+  "storage() -- create a new in-memory storage (can load/save, but not commit/rollback)\n""storage(filename, rw) -- open file, rw=0: r/o, rw=1: r/w, rw=2: extend";
 
 static PyObject *PyStorage_new(PyObject *o, PyObject *_args) {
   try {
@@ -362,16 +358,6 @@ static PyObject *PyStorage_new(PyObject *o, PyObject *_args) {
     switch (args.len()) {
       case 0:
         ps = new PyStorage;
-        break;
-      case 1:
-        if (!PyFile_Check((PyObject*)args[0])) {
-          if (PyString_Check((PyObject*)args[0]))
-            Fail(PyExc_TypeError, "rw parameter missing");
-          else
-            Fail(PyExc_TypeError, "argument not an open file");
-          break;
-        }
-        ps = new PyStorage(*new c4_FileStrategy(PyFile_AsFile(args[0])), true);
         break;
       case 4:
          { // Rrrrrr...
@@ -451,11 +437,6 @@ bool PyViewer::GetItem(int row_, int col_, c4_Bytes &buf_) {
     return prop(_tempRow).GetData(buf_);
   }
   PyObject *item = _data[row_];
-  if (PyInstance_Check(item)) {
-    PyObject *attr = PyObject_GetAttrString(item, (char*)prop.Name());
-    PyRowRef::setFromPython(_tempRow, prop, attr);
-    return prop(_tempRow).GetData(buf_);
-  }
   if (PyDict_Check(item)) {
     PyObject *attr = PyDict_GetItemString(item, (char*)prop.Name());
     PyRowRef::setFromPython(_tempRow, prop, attr);
@@ -465,8 +446,11 @@ bool PyViewer::GetItem(int row_, int col_, c4_Bytes &buf_) {
     PyRowRef::setFromPython(_tempRow, prop, _data[row_]);
     return prop(_tempRow).GetData(buf_);
   }
-  Fail(PyExc_ValueError, "Object has no usable attributes");
-  return false;
+
+  // generic object, check attributes
+  PyObject *attr = PyObject_GetAttrString(item, (char*)prop.Name());
+  PyRowRef::setFromPython(_tempRow, prop, attr);
+  return prop(_tempRow).GetData(buf_);
   // create a row with just this single property value
   // this detour handles dicts and objects, because makeRow does
   /*  c4_Row one;
@@ -537,14 +521,81 @@ static PyMethodDef Mk4Methods[] =  {
   }
 };
 
-extern "C"__declspec(dllexport)
-void initMk4py() {
-  PyObject *m = Py_InitModule4("Mk4py", Mk4Methods, mk4py_module_documentation,
-    0, PYTHON_API_VERSION);
-  PyObject_SetAttrString(m, "version", PyString_FromString("2.4.9.7"));
-  PyObject_SetAttrString(m, "ViewType", (PyObject*) &PyViewtype);
-  PyObject_SetAttrString(m, "ViewerType", (PyObject*) &PyViewertype);
-  PyObject_SetAttrString(m, "ROViewerType", (PyObject*) &PyROViewertype);
-  PyObject_SetAttrString(m, "RowRefType", (PyObject*) &PyRowReftype);
-  PyObject_SetAttrString(m, "RORowRefType", (PyObject*) &PyRORowReftype);
+static struct PyModuleDef Mk4Def = {
+  PyModuleDef_HEAD_INIT,
+  "Mk4py",
+  mk4py_module_documentation,
+  -1,
+  Mk4Methods,
+};
+
+extern "C" __declspec(dllexport)
+PyMODINIT_FUNC PyInit_Mk4py() {
+  PyObject *m = PyModule_Create(&Mk4Def);
+  PyObject_SetAttrString(m, "version", PyUnicode_FromString("2.4.9.7"));
+
+  if (PyType_Ready(&PyStorage_Type) < 0)
+    return NULL;
+  Py_INCREF(&PyStorage_Type);
+  if (PyModule_AddObject(m, "StorageType", (PyObject *) &PyStorage_Type) < 0) {
+    Py_DECREF(&PyStorage_Type);
+    Py_DECREF(m);
+    return NULL;
+  }
+
+  if (PyType_Ready(&PyProperty_Type) < 0)
+    return NULL;
+  Py_INCREF(&PyProperty_Type);
+  if (PyModule_AddObject(m, "PropertyType", (PyObject *) &PyProperty_Type) < 0) {
+    Py_DECREF(&PyProperty_Type);
+    Py_DECREF(m);
+    return NULL;
+  }
+
+  if (PyType_Ready(&PyRowRef_Type) < 0)
+    return NULL;
+  Py_INCREF(&PyRowRef_Type);
+  if (PyModule_AddObject(m, "RowRefType", (PyObject *) &PyRowRef_Type) < 0) {
+    Py_DECREF(&PyRowRef_Type);
+    Py_DECREF(m);
+    return NULL;
+  }
+
+  if (PyType_Ready(&PyRORowRef_Type) < 0)
+    return NULL;
+  Py_INCREF(&PyRORowRef_Type);
+  if (PyModule_AddObject(m, "RORowRefType", (PyObject *) &PyRORowRef_Type) < 0) {
+    Py_DECREF(&PyRORowRef_Type);
+    Py_DECREF(m);
+    return NULL;
+  }
+
+  if (PyType_Ready(&PyView_Type) < 0)
+    return NULL;
+  Py_INCREF(&PyView_Type);
+  if (PyModule_AddObject(m, "ViewType", (PyObject *) &PyView_Type) < 0) {
+    Py_DECREF(&PyView_Type);
+    Py_DECREF(m);
+    return NULL;
+  }
+
+  if (PyType_Ready(&PyViewer_Type) < 0)
+    return NULL;
+  Py_INCREF(&PyViewer_Type);
+  if (PyModule_AddObject(m, "ViewerType", (PyObject *) &PyViewer_Type) < 0) {
+    Py_DECREF(&PyViewer_Type);
+    Py_DECREF(m);
+    return NULL;
+  }
+
+  if (PyType_Ready(&PyROViewer_Type) < 0)
+    return NULL;
+  Py_INCREF(&PyROViewer_Type);
+  if (PyModule_AddObject(m, "ROViewerType", (PyObject *) &PyROViewer_Type) < 0) {
+    Py_DECREF(&PyROViewer_Type);
+    Py_DECREF(m);
+    return NULL;
+  }
+
+  return m;
 }

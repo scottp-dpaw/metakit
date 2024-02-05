@@ -11,22 +11,22 @@
 #include <mk4.h>
 #include "PyHead.h"
 
-extern PyTypeObject PyStoragetype;
+extern PyTypeObject PyStorage_Type;
 class SiasStrategy;
 
-#define PyStorage_Check(v) ((v)->ob_type==&PyStoragetype)
+#define PyStorage_Check(v) ((v)->ob_type==&PyStorage_Type)
 
 class PyStorage: public PyHead, public c4_Storage {
   public:
-    PyStorage(): PyHead(PyStoragetype){}
+    PyStorage(): PyHead(PyStorage_Type){}
     PyStorage(c4_Strategy &strategy_, bool owned_ = false, int mode_ = 1):
-      PyHead(PyStoragetype), c4_Storage(strategy_, owned_, mode_){}
-    PyStorage(const char *fnm, int mode): PyHead(PyStoragetype), c4_Storage(fnm,
+      PyHead(PyStorage_Type), c4_Storage(strategy_, owned_, mode_){}
+    PyStorage(const char *fnm, int mode): PyHead(PyStorage_Type), c4_Storage(fnm,
       mode){}
-    PyStorage(const c4_Storage &storage_): PyHead(PyStoragetype), c4_Storage
+    PyStorage(const c4_Storage &storage_): PyHead(PyStorage_Type), c4_Storage
       (storage_){}
     //  PyStorage(const char *fnm, const char *descr) 
-    //    : PyHead(PyStoragetype), c4_Storage(fnm, descr) { }
+    //    : PyHead(PyStorage_Type), c4_Storage(fnm, descr) { }
     ~PyStorage(){}
 };
 

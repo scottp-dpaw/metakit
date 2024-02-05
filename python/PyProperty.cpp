@@ -9,12 +9,6 @@
 #include <PWONumber.h>
 #include <PWOSequence.h>
 
-static PyMethodDef PropertyMethods[] =  {
-   {
-    0, 0, 0, 0
-  }
-};
-
 static void PyProperty_dealloc(PyProperty *o) {
   delete o;
 }
@@ -39,7 +33,7 @@ static PyObject *PyProperty_getattr(PyProperty *o, char *nm) {
       PWONumber rslt(o->GetId());
       return rslt.disOwn();
     }
-    return Py_FindMethod(PropertyMethods, o, nm);
+    return PyObject_GenericGetAttr(o, PyUnicode_FromString(nm));
   } catch (...) {
     return 0;
   }
@@ -64,17 +58,14 @@ static int PyProperty_compare(PyProperty *o, PyObject *ob) {
   }
 }
 
-PyTypeObject PyPropertytype =  {
-  PyObject_HEAD_INIT(&PyType_Type)0, "PyProperty", sizeof(PyProperty), 0, 
-    (destructor)PyProperty_dealloc,  /*tp_dealloc*/
-  (printfunc)PyProperty_print,  /*tp_print*/
-  (getattrfunc)PyProperty_getattr,  /*tp_getattr*/
-  0,  /*tp_setattr*/
-  (cmpfunc)PyProperty_compare,  /*tp_compare*/
-  0,  /*tp_repr*/
-  0,  /*tp_as_number*/
-  0,  /*tp_as_sequence*/
-  0,  /*tp_as_mapping*/
+PyTypeObject PyProperty_Type = {
+  .ob_base = PyObject_HEAD_INIT(&PyType_Type) 
+  .tp_name = "PyProperty", 
+  .tp_basicsize = sizeof(PyProperty),
+  .tp_itemsize = 0,
+  .tp_dealloc = (destructor)PyProperty_dealloc,
+  .tp_print = (printfunc)PyProperty_print,
+  .tp_getattr = (getattrfunc)PyProperty_getattr,
 };
 
 PyObject *PyProperty_new(PyObject *o, PyObject *_args) {

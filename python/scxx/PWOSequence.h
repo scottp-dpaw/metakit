@@ -133,11 +133,11 @@ class PWOString: public PWOSequence {
   public:
     PWOString(): PWOSequence(){}
     ;
-    PWOString(const char *s): PWOSequence(PyString_FromString((char*)s)) {
+    PWOString(const char *s): PWOSequence(PyUnicode_FromString((char*)s)) {
         LoseRef(_obj);
     }
-    PWOString(const char *s, int sz): PWOSequence(PyString_FromStringAndSize(
-      (char*)s, sz)) {
+    PWOString(const char *s, int sz): PWOSequence(PyUnicode_DecodeUTF8(
+      (char*)s, sz, NULL)) {
         LoseRef(_obj);
     }
     PWOString(const PWOString &other): PWOSequence(other){}
@@ -161,19 +161,21 @@ class PWOString: public PWOSequence {
         return  *this;
     };
     virtual void _violentTypeCheck() {
-        if (!PyString_Check(_obj)) {
+        if (!PyUnicode_Check(_obj)) {
             GrabRef(0);
             Fail(PyExc_TypeError, "not a Python string");
         }
     };
     operator const char *()const {
-        return PyString_AsString(_obj);
+        return PyUnicode_AsUTF8(_obj);
     };
     int size()const {
-        return PyString_GET_SIZE(_obj);
+        Py_ssize_t size = 0;
+        PyUnicode_AsUTF8AndSize(_obj, &size);
+        return size;
     };
     static PWOString format(const PWOString &fmt, PWOTuple &args) {
-        PyObject *rslt = PyString_Format(fmt, args);
+        PyObject *rslt = PyUnicode_Format(fmt, args);
         if (rslt == NULL)
           Fail(PyExc_RuntimeError, "string format failed");
         return LoseRef(rslt);

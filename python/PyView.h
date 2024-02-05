@@ -14,18 +14,18 @@
 #include <PWONumber.h>
 #include "PyHead.h"
 
-#define PyView_Check(v) ((v)->ob_type==&PyViewtype)
-#define PyViewer_Check(v) ((v)->ob_type==&PyViewertype)
-#define PyROViewer_Check(v) ((v)->ob_type==&PyROViewertype)
+#define PyView_Check(v) ((v)->ob_type==&PyView_Type)
+#define PyViewer_Check(v) ((v)->ob_type==&PyViewer_Type)
+#define PyROViewer_Check(v) ((v)->ob_type==&PyROViewer_Type)
 #define PyGenericView_Check(v) (PyView_Check(v) || PyViewer_Check(v) || \
   PyROViewer_Check(v))
 
 class PyView;
 class PyRowRef;
 
-extern PyTypeObject PyViewtype;
-extern PyTypeObject PyViewertype;
-extern PyTypeObject PyROViewertype;
+extern PyTypeObject PyView_Type;
+extern PyTypeObject PyViewer_Type;
+extern PyTypeObject PyROViewer_Type;
 
 #define BASE 0              //0000
 #define MVIEWER 4           //0100

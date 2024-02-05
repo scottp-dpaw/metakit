@@ -11,15 +11,15 @@
 #include <mk4.h>
 #include "PyHead.h"
 
-#define PyProperty_Check(ob) ((ob)->ob_type == &PyPropertytype)
+#define PyProperty_Check(ob) ((ob)->ob_type == &PyProperty_Type)
 
-extern PyTypeObject PyPropertytype;
+extern PyTypeObject PyProperty_Type;
 
 class PyProperty: public PyHead, public c4_Property {
   public:
     //PyProperty();
-    PyProperty(const c4_Property &o): PyHead(PyPropertytype), c4_Property(o){}
-    PyProperty(char t, const char *n): PyHead(PyPropertytype), c4_Property(t, n)
+    PyProperty(const c4_Property &o): PyHead(PyProperty_Type), c4_Property(o){}
+    PyProperty(char t, const char *n): PyHead(PyProperty_Type), c4_Property(t, n)
       {}
     ~PyProperty(){}
 };

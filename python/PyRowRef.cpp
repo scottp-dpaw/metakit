@@ -14,12 +14,6 @@
 #define LONG_LONG PY_LONG_LONG
 #endif 
 
-static PyMethodDef RowRefMethods[] =  {
-   {
-    0, 0, 0, 0
-  }
-};
-
 static void PyRowRef_dealloc(PyRowRef *o) {
   //o->~PyRowRef();
   delete o;
@@ -49,7 +43,7 @@ static PyObject *PyRowRef_getattr(PyRowRef *o, char *nm) {
       } else if (strcmp(nm, "__view__") == 0) {
         return new PyView(o->Container());
       } else if (strcmp(nm, "__index__") == 0) {
-        return PyInt_FromLong((&(*o))._index);
+        return PyLong_FromLong((&(*o))._index);
       }
     }
 
@@ -57,7 +51,7 @@ static PyObject *PyRowRef_getattr(PyRowRef *o, char *nm) {
     if (attr)
       return attr;
     PyErr_Clear();
-    return Py_FindMethod(RowRefMethods, (PyObject*)o, nm);
+    return PyObject_GenericGetAttr((PyObject*)o, PyUnicode_FromString(nm));
   } catch (...) {
     return NULL;
   }
@@ -81,36 +75,32 @@ static int PyRowRef_setattr(PyRowRef *o, char *nm, PyObject *v) {
   }
 }
 
-PyTypeObject PyRowReftype =  {
-  PyObject_HEAD_INIT(&PyType_Type)0, "PyRowRef", sizeof(PyRowRef), 0, 
-    (destructor)PyRowRef_dealloc,  /*tp_dealloc*/
-  (printfunc)PyRowRef_print,  /*tp_print*/
-  (getattrfunc)PyRowRef_getattr,  /*tp_getattr*/
-  (setattrfunc)PyRowRef_setattr,  /*tp_setattr*/
-  (cmpfunc)0,  /*tp_compare*/
-  (reprfunc)0,  /*tp_repr*/
-  0,  /*tp_as_number*/
-  0,  /*tp_as_sequence*/
-  0,  /*tp_as_mapping*/
+PyTypeObject PyRowRef_Type =  {
+  .ob_base = PyObject_HEAD_INIT(&PyType_Type)
+  .tp_name = "PyRowRef",
+  .tp_basicsize = sizeof(PyRowRef),
+  .tp_itemsize = 0, 
+  .tp_dealloc = (destructor)PyRowRef_dealloc,
+  .tp_print = (printfunc)PyRowRef_print,
+  .tp_getattr = (getattrfunc)PyRowRef_getattr,
+  .tp_setattr = (setattrfunc)PyRowRef_setattr,
 };
-PyTypeObject PyRORowReftype =  {
-  PyObject_HEAD_INIT(&PyType_Type)0, "PyRORowRef", sizeof(PyRowRef), 0, 
-    (destructor)PyRowRef_dealloc,  /*tp_dealloc*/
-  (printfunc)PyRORowRef_print,  /*tp_print*/
-  (getattrfunc)PyRowRef_getattr,  /*tp_getattr*/
-  (setattrfunc)0,  /*tp_setattr*/
-  (cmpfunc)0,  /*tp_compare*/
-  (reprfunc)0,  /*tp_repr*/
-  0,  /*tp_as_number*/
-  0,  /*tp_as_sequence*/
-  0,  /*tp_as_mapping*/
+
+PyTypeObject PyRORowRef_Type =  {
+  .ob_base = PyObject_HEAD_INIT(&PyType_Type)
+  .tp_name = "PyRORowRef",
+  .tp_basicsize = sizeof(PyRowRef),
+  .tp_itemsize = 0,
+  .tp_dealloc = (destructor)PyRowRef_dealloc,
+  .tp_print = (printfunc)PyRORowRef_print,
+  .tp_getattr = (getattrfunc)PyRowRef_getattr,
 };
 
 
-PyRowRef::PyRowRef(const c4_RowRef &o, int immutable): PyHead(PyRowReftype),
+PyRowRef::PyRowRef(const c4_RowRef &o, int immutable): PyHead(PyRowRef_Type),
   c4_RowRef(o) {
   if (immutable)
-    ob_type = &PyRORowReftype;
+    ob_type = &PyRORowRef_Type;
   c4_Cursor c = &(*(c4_RowRef*)this);
   c._seq->IncRef();
 }
@@ -120,8 +110,8 @@ void PyRowRef::setFromPython(const c4_RowRef &row, const c4_Property &prop,
   PyObject *attr) {
   switch (prop.Type()) {
     case 'I':
-      if (PyInt_Check(attr)) {
-        long number = PyInt_AsLong(attr);
+      if (PyLong_Check(attr)) {
+        long number = PyLong_AsLong(attr);
         if (number ==  - 1 && PyErr_Occurred() != NULL)
           Fail(PyExc_ValueError, "int too large to convert to C long");
         ((const c4_IntProp &)prop)(row) = number;
@@ -140,8 +130,8 @@ void PyRowRef::setFromPython(const c4_RowRef &row, const c4_Property &prop,
             ;
         ((const c4_LongProp &)prop)(row) = number;
       }
-       else if (PyInt_Check(attr)) {
-        long number = PyInt_AsLong(attr);
+       else if (PyLong_Check(attr)) {
+        long number = PyLong_AsLong(attr);
         if (number ==  - 1 && PyErr_Occurred() != NULL)
           Fail(PyExc_ValueError, "int too large to convert to C long");
         ((const c4_LongProp &)prop)(row) = number;
@@ -209,8 +199,10 @@ void PyRowRef::setFromPython(const c4_RowRef &row, const c4_Property &prop,
       break;
     case 'B':
     case 'M':
-      if (PyString_Check(attr)) {
-        c4_Bytes temp(PyString_AS_STRING(attr), PyString_GET_SIZE(attr), false);
+      if (PyUnicode_Check(attr)) {
+        Py_ssize_t size = 0;
+        const char *attrData = PyUnicode_AsUTF8AndSize(attr, &size);
+        c4_Bytes temp(attrData, size, false);
         prop(row).SetData(temp);
       }
        else if (attr != Py_None)

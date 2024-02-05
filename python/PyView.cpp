@@ -26,7 +26,7 @@ static void MustBeView(PyObject *o) {
     Fail(PyExc_TypeError, "Arg must be a view object");
 }
 
-static char *setsize__doc = 
+static const char *setsize__doc = 
   "setsize(nrows) -- adjust the number of rows in a view";
 
 static PyObject *PyView_setsize(PyView *o, PyObject *_args) {
@@ -42,7 +42,7 @@ static PyObject *PyView_setsize(PyView *o, PyObject *_args) {
   }
 }
 
-static char *structure__doc = "structure() -- return list of properties";
+static const char *structure__doc = "structure() -- return list of properties";
 
 static PyObject *PyView_structure(PyView *o, PyObject *_args) {
   try {
@@ -55,7 +55,7 @@ static PyObject *PyView_structure(PyView *o, PyObject *_args) {
   }
 }
 
-static char *properties__doc = 
+static const char *properties__doc = 
   "properties() -- return a dictionary mapping property names to property objects";
 
 static PyObject *PyView_properties(PyView *o, PyObject *_args) {
@@ -69,7 +69,7 @@ static PyObject *PyView_properties(PyView *o, PyObject *_args) {
   }
 }
 
-static char *insert__doc = 
+static const char *insert__doc = 
   "insert(position, obj) -- coerce obj (or keyword args) to row and insert before position";
 
 static PyObject *PyView_insert(PyView *o, PyObject *_args, PyObject *kwargs) {
@@ -100,7 +100,7 @@ static PyObject *PyView_insert(PyView *o, PyObject *_args, PyObject *kwargs) {
   return 0; /* satisfy compiler */
 }
 
-static char *append__doc = 
+static const char *append__doc = 
   "append(obj) -- coerce obj (or keyword args) to row and append, returns position";
 
 static PyObject *PyView_append(PyView *o, PyObject *_args, PyObject *kwargs) {
@@ -121,7 +121,7 @@ static PyObject *PyView_append(PyView *o, PyObject *_args, PyObject *kwargs) {
   }
 }
 
-static char *delete__doc = 
+static const char *delete__doc = 
   "delete(position) -- delete row at specified position";
 
 static PyObject *PyView_delete(PyView *o, PyObject *_args) {
@@ -137,7 +137,7 @@ static PyObject *PyView_delete(PyView *o, PyObject *_args) {
   }
 }
 
-static char *addproperty__doc = 
+static const char *addproperty__doc = 
   "addproperty(property) -- add temp column to view (use getas() for persistent columns)";
 
 static PyObject *PyView_addproperty(PyView *o, PyObject *_args) {
@@ -153,7 +153,7 @@ static PyObject *PyView_addproperty(PyView *o, PyObject *_args) {
   }
 }
 
-static char *select__doc = 
+static const char *select__doc = 
   "select(criteria) -- return virtual view with selected rows\n"
   "select(crit_lo, crit_hi) -- select rows in specified range (inclusive)\n"
   "  criteria may be keyword args or dictionary";
@@ -185,7 +185,7 @@ static PyObject *PyView_select(PyView *o, PyObject *_args, PyObject *kwargs) {
   }
 }
 
-static char *sort__doc = 
+static const char *sort__doc = 
   "sort() -- return virtual sorted view (native key order)\n"
   "sort(property...) -- sort on the specified properties";
 
@@ -203,7 +203,7 @@ static PyObject *PyView_sort(PyView *o, PyObject *_args) {
   }
 }
 
-static char *sortrev__doc = 
+static const char *sortrev__doc = 
   "sortrev(props,propsdown) -- return sorted view, with optional reversed order\n"" arguments are lists of properties";
 
 static PyObject *PyView_sortrev(PyView *o, PyObject *_args) {
@@ -225,7 +225,7 @@ static PyObject *PyView_sortrev(PyView *o, PyObject *_args) {
   }
 }
 
-static char *project__doc = 
+static const char *project__doc = 
   "project(property...) -- returns virtual view with only the named columns";
 
 static PyObject *PyView_project(PyView *o, PyObject *_args) {
@@ -239,7 +239,7 @@ static PyObject *PyView_project(PyView *o, PyObject *_args) {
   }
 }
 
-static char *flatten__doc = 
+static const char *flatten__doc = 
   "flatten(subview_property, outer) -- produces 'flat' view from nested view\n"
   " outer defaults to 0";
 
@@ -270,7 +270,7 @@ static PyObject *PyView_flatten(PyView *o, PyObject *_args, PyObject *_kwargs) {
   }
 }
 
-static char *join__doc = 
+static const char *join__doc = 
   "join(otherview, property..., outer) -- join views on properties of same name and type\n"" outer defaults to 0";
 
 static PyObject *PyView_join(PyView *o, PyObject *_args, PyObject *_kwargs) {
@@ -283,7 +283,7 @@ static PyObject *PyView_join(PyView *o, PyObject *_args, PyObject *_kwargs) {
     PyView *other = (PyView*)(PyObject*)args[0];
     bool outer = false;
     int last = args.len();
-    if (PyInt_Check((PyObject*)args[last - 1])) {
+    if (PyLong_Check((PyObject*)args[last - 1])) {
       PWONumber flag(args[--last]);
       if ((int)flag > 0)
         outer = true;
@@ -301,7 +301,7 @@ static PyObject *PyView_join(PyView *o, PyObject *_args, PyObject *_kwargs) {
   }
 }
 
-static char *groupby__doc = 
+static const char *groupby__doc = 
   "groupby(property..., 'subname') -- group by given properties, creating subviews";
 
 static PyObject *PyView_groupby(PyView *o, PyObject *_args) {
@@ -318,7 +318,7 @@ static PyObject *PyView_groupby(PyView *o, PyObject *_args) {
   }
 }
 
-static char *counts__doc = 
+static const char *counts__doc = 
   "counts(property..., 'name') -- group by given properties, adding a count property";
 
 static PyObject *PyView_counts(PyView *o, PyObject *_args) {
@@ -335,7 +335,7 @@ static PyObject *PyView_counts(PyView *o, PyObject *_args) {
   }
 }
 
-static char *rename__doc = 
+static const char *rename__doc = 
   "rename('oldname', 'newname') -- derive a view with one property renamed";
 
 static PyObject *PyView_rename(PyView *o, PyObject *_args) {
@@ -357,7 +357,7 @@ static PyObject *PyView_rename(PyView *o, PyObject *_args) {
   }
 }
 
-static char *unique__doc = 
+static const char *unique__doc = 
   "unique() -- returns a view without duplicate rows, i.e. a set";
 
 static PyObject *PyView_unique(PyView *o, PyObject *_args) {
@@ -368,7 +368,7 @@ static PyObject *PyView_unique(PyView *o, PyObject *_args) {
   }
 }
 
-static char *product__doc = 
+static const char *product__doc = 
   "product(view2) -- produce the cartesian product of both views";
 
 static PyObject *PyView_product(PyView *o, PyObject *_args) {
@@ -382,7 +382,7 @@ static PyObject *PyView_product(PyView *o, PyObject *_args) {
   }
 }
 
-static char *union__doc = "union(view2) -- produce the set union of both views";
+static const char *union__doc = "union(view2) -- produce the set union of both views";
 
 static PyObject *PyView_union(PyView *o, PyObject *_args) {
   try {
@@ -395,7 +395,7 @@ static PyObject *PyView_union(PyView *o, PyObject *_args) {
   }
 }
 
-static char *intersect__doc = 
+static const char *intersect__doc = 
   "intersect(view2) -- produce the set intersection of both views";
 
 static PyObject *PyView_intersect(PyView *o, PyObject *_args) {
@@ -409,7 +409,7 @@ static PyObject *PyView_intersect(PyView *o, PyObject *_args) {
   }
 }
 
-static char *different__doc = 
+static const char *different__doc = 
   "different(view2) -- produce the set difference of both views (XOR)";
 
 static PyObject *PyView_different(PyView *o, PyObject *_args) {
@@ -423,7 +423,7 @@ static PyObject *PyView_different(PyView *o, PyObject *_args) {
   }
 }
 
-static char *minus__doc = "minus(view2) -- all rows in view, but not in view2";
+static const char *minus__doc = "minus(view2) -- all rows in view, but not in view2";
 
 static PyObject *PyView_minus(PyView *o, PyObject *_args) {
   try {
@@ -436,7 +436,7 @@ static PyObject *PyView_minus(PyView *o, PyObject *_args) {
   }
 }
 
-static char *remapwith__doc = 
+static const char *remapwith__doc = 
   "remapwith(view2) -- remap rows according to first (int) prop in view2";
 
 static PyObject *PyView_remapwith(PyView *o, PyObject *_args) {
@@ -450,7 +450,7 @@ static PyObject *PyView_remapwith(PyView *o, PyObject *_args) {
   }
 }
 
-static char *pair__doc = 
+static const char *pair__doc = 
   "pair(view2) -- concatenate rows pairwise, side by side";
 
 static PyObject *PyView_pair(PyView *o, PyObject *_args) {
@@ -464,7 +464,7 @@ static PyObject *PyView_pair(PyView *o, PyObject *_args) {
   }
 }
 
-static char *hash__doc = 
+static const char *hash__doc = 
   "hash(mapview,numkeys) -- create a hashed view mapping\n"
   " numkeys defaults to 1\n"
   " without args, creates a temporary hash on one key";
@@ -485,7 +485,7 @@ static PyObject *PyView_hash(PyView *o, PyObject *_args) {
   }
 }
 
-static char *blocked__doc = 
+static const char *blocked__doc = 
   "blocked() -- create a blocked/balanced view mapping";
 
 static PyObject *PyView_blocked(PyView *o, PyObject *_args) {
@@ -496,7 +496,7 @@ static PyObject *PyView_blocked(PyView *o, PyObject *_args) {
   }
 }
 
-static char *ordered__doc = 
+static const char *ordered__doc = 
   "ordered(numkeys) -- create a order-maintaining view mapping\n"
   " numkeys defaults to 1";
 
@@ -510,7 +510,7 @@ static PyObject *PyView_ordered(PyView *o, PyObject *_args) {
   }
 }
 
-static char *indexed__doc = 
+static const char *indexed__doc = 
   "indexed(map, property..., unique) -- create a mapped view which manages an index\n"" unique defaults to 0 (not unique)";
 
 static PyObject *PyView_indexed(PyView *o, PyObject *_args) {
@@ -520,7 +520,7 @@ static PyObject *PyView_indexed(PyView *o, PyObject *_args) {
     PyView *other = (PyView*)(PyObject*)args[0];
     bool unique = false;
     int last = args.len();
-    if (PyInt_Check((PyObject*)args[last - 1])) {
+    if (PyLong_Check((PyObject*)args[last - 1])) {
       PWONumber flag(args[--last]); //XXX kwargs?
       if ((int)flag > 0)
         unique = true;
@@ -534,7 +534,7 @@ static PyObject *PyView_indexed(PyView *o, PyObject *_args) {
   }
 }
 
-static char *find__doc = 
+static const char *find__doc = 
   "find(criteria, start) -- return index of row found, matching criteria\n"
   " criteria maybe keyword args, or a dictionary";
 
@@ -566,7 +566,7 @@ static PyObject *PyView_find(PyView *o, PyObject *_args, PyObject *_kwargs) {
   }
 }
 
-static char *search__doc = 
+static const char *search__doc = 
   "search(criteria) -- binary search (native view order), returns match or insert pos";
 
 static PyObject *PyView_search(PyView *o, PyObject *_args, PyObject *kwargs) {
@@ -582,7 +582,7 @@ static PyObject *PyView_search(PyView *o, PyObject *_args, PyObject *kwargs) {
   }
 }
 
-static char *locate__doc = 
+static const char *locate__doc = 
   "locate(criteria) -- binary search, returns tuple with pos and count";
 
 static PyObject *PyView_locate(PyView *o, PyObject *_args, PyObject *kwargs) {
@@ -604,7 +604,7 @@ static PyObject *PyView_locate(PyView *o, PyObject *_args, PyObject *kwargs) {
   }
 }
 
-static char *access__doc = 
+static const char *access__doc = 
   "access(memoprop, rownum, offset, length=0) -- get (partial) memo property contents";
 
 static PyObject *PyView_access(PyView *o, PyObject *_args) {
@@ -616,21 +616,21 @@ static PyObject *PyView_access(PyView *o, PyObject *_args) {
     c4_BytesProp &prop = *(c4_BytesProp*)(c4_Property*)(PyProperty*)(PyObject*)
       args[0];
 
-    int index = PyInt_AsLong(args[1]);
+    int index = PyLong_AsLong(args[1]);
     if (index < 0 || index >= o->GetSize())
       Fail(PyExc_IndexError, "Index out of range");
 
     c4_RowRef row = o->GetAt(index);
 
-    long offset = PyInt_AsLong(args[2]);
-    int length = args.len() == 3 ? 0 : PyInt_AsLong(args[3]);
+    long offset = PyLong_AsLong(args[2]);
+    int length = args.len() == 3 ? 0 : PyLong_AsLong(args[3]);
     if (length <= 0) {
       length = prop(row).GetSize() - offset;
       if (length < 0)
         length = 0;
     }
 
-    PyObject *buffer = PyString_FromStringAndSize(0, length);
+    char *buffer = new char[length]();
     int o = 0;
 
     while (o < length) {
@@ -638,20 +638,20 @@ static PyObject *PyView_access(PyView *o, PyObject *_args) {
       int n = buf.Size();
       if (n == 0)
         break;
-      memcpy(PyString_AS_STRING(buffer) + o, buf.Contents(), n);
+      memcpy(buffer + o, buf.Contents(), n);
       o += n;
     }
 
-    if (o < length)
-      _PyString_Resize(&buffer, o);
+    PyObject *result = PyUnicode_DecodeUTF8(buffer, length, NULL);
+    delete buffer;
 
-    return buffer;
+    return result;
   } catch (...) {
     return 0;
   }
 }
 
-static char *modify__doc = 
+static const char *modify__doc = 
   "modify(memoprop, rownum, string, offset, diff=0) -- store (partial) memo contents\n""diff removes (<0) or inserts (>0) bytes, and is adjusted to within sensible range";
 
 static PyObject *PyView_modify(PyView *o, PyObject *_args) {
@@ -685,7 +685,7 @@ static PyObject *PyView_modify(PyView *o, PyObject *_args) {
   }
 }
 
-static char *itemsize__doc = 
+static const char *itemsize__doc = 
   "itemsize(prop, rownum=0) -- return size of item (rownum only needed for S/B/M types)\n""with integer fields, a result of -1/-2/-4 means 1/2/4 bits per value, respectively";
 
 static PyObject *PyView_itemsize(PyView *o, PyObject *_args) {
@@ -706,7 +706,7 @@ static PyObject *PyView_itemsize(PyView *o, PyObject *_args) {
   }
 }
 
-static char *relocrows__doc = 
+static const char *relocrows__doc = 
   "relocrows(from, count, dest, pos) -- relocate rows within views of same storage\n""from is source offset, count is number of rows, pos is destination offset\n""both views must have a compatible structure (field names may differ)";
 
 static PyObject *PyView_relocrows(PyView *o, PyObject *_args) {
@@ -742,7 +742,7 @@ static PyObject *PyView_relocrows(PyView *o, PyObject *_args) {
   }
 }
 
-static char *map__doc = 
+static const char *map__doc = 
   "map(func, subset=None) -- apply func to each row of view,\n"
   "or (if subset specified) to each row in view that is also in subset.\n"
   "Returns None: view is mutated\n"
@@ -770,7 +770,7 @@ static PyObject *PyView_map(PyView *o, PyObject *_args) {
   }
 }
 
-static char *filter__doc = 
+static const char *filter__doc = 
   "filter(func) -- return a new view containing the indices of those rows satisfying func.\n""  func must have the signature func(row), and should return a false value to omit row.";
 
 static PyObject *PyView_filter(PyView *o, PyObject *_args) {
@@ -783,7 +783,7 @@ static PyObject *PyView_filter(PyView *o, PyObject *_args) {
   }
 }
 
-static char *reduce__doc = 
+static const char *reduce__doc = 
   "reduce(func, start=0) -- return the result of applying func(row, lastresult) to\n""each row in view.\n";
 
 static PyObject *PyView_reduce(PyView *o, PyObject *_args) {
@@ -799,7 +799,7 @@ static PyObject *PyView_reduce(PyView *o, PyObject *_args) {
   }
 }
 
-static char *remove__doc = 
+static const char *remove__doc = 
   "remove(indices) -- remove all rows whose indices are in subset from view\n"
   "Not the same as minus, because unique is not required, and view is not reordered.\n";
 
@@ -817,7 +817,7 @@ static PyObject *PyView_remove(PyView *o, PyObject *_args) {
   }
 }
 
-static char *indices__doc = 
+static const char *indices__doc = 
   "indices(subset) -- returns a view containing the indices in view of the rows of subset";
 
 static PyObject *PyView_indices(PyView *o, PyObject *_args) {
@@ -832,7 +832,7 @@ static PyObject *PyView_indices(PyView *o, PyObject *_args) {
   }
 }
 
-static char *copy__doc = "copy() -- returns a copy of the view\n";
+static const char *copy__doc = "copy() -- returns a copy of the view\n";
 
 static PyObject *PyView_copy(PyView *o, PyObject *_args) {
   try {
@@ -1199,9 +1199,12 @@ static PySequenceMethods ViewAsSeq =  {
   PyView_concat,  //sq_concat
   PyView_repeat,  //sq_repeat
   PyView_getitem,  //sq_item
-  PyView_getslice,  //sq_slice
+  0,  //was_sq_slice
   PyView_setitem,  //sq_ass_item
-  PyView_setslice,  //sq_ass_slice
+  0,  //was_sq_ass_slice
+  0,  //sq_contains
+  0,  //sq_inplace_concat
+  0,  //sq_inplace_repeat
 };
 
 static PySequenceMethods ViewerAsSeq =  {
@@ -1209,9 +1212,12 @@ static PySequenceMethods ViewerAsSeq =  {
   PyView_concat,  //sq_concat
   PyView_repeat,  //sq_repeat
   PyView_getitem,  //sq_item
-  PyView_getslice,  //sq_slice
+  0,  //was_sq_slice
   0,  //sq_ass_item
   0,  //sq_ass_slice
+  0,  //sq_contains
+  0,  //sq_inplace_concat
+  0,  //sq_inplace_repeat
 };
 
 static void PyView_dealloc(PyView *o) {
@@ -1237,9 +1243,6 @@ static int PyROViewer_print(PyView *o, FILE *f, int) {
 static PyObject *PyView_getattr(PyView *o, char *nm) {
   PyObject *rslt;
   try {
-    rslt = Py_FindMethod(ViewMethods, o, nm);
-    if (rslt)
-      return rslt;
     PyErr_Clear();
     int ndx = o->FindPropIndexByName(nm);
     if (ndx >  - 1)
@@ -1254,9 +1257,6 @@ static PyObject *PyView_getattr(PyView *o, char *nm) {
 static PyObject *PyViewer_getattr(PyView *o, char *nm) {
   PyObject *rslt;
   try {
-    rslt = Py_FindMethod(ViewerMethods, o, nm);
-    if (rslt)
-      return rslt;
     PyErr_Clear();
     int ndx = o->FindPropIndexByName(nm);
     if (ndx >  - 1)
@@ -1269,42 +1269,37 @@ static PyObject *PyViewer_getattr(PyView *o, char *nm) {
 }
 
 
-PyTypeObject PyViewtype =  {
-  PyObject_HEAD_INIT(&PyType_Type)0, "PyView", sizeof(PyView), 0, (destructor)
-    PyView_dealloc,  /*tp_dealloc*/
-  (printfunc)PyView_print,  /*tp_print*/
-  (getattrfunc)PyView_getattr,  /*tp_getattr*/
-  0,  /*tp_setattr*/
-  (cmpfunc)0,  /*tp_compare*/
-  (reprfunc)0,  /*tp_repr*/
-  0,  /*tp_as_number*/
-   &ViewAsSeq,  /*tp_as_sequence*/
-  0,  /*tp_as_mapping*/
+PyTypeObject PyView_Type = {
+  .ob_base = PyObject_HEAD_INIT(&PyType_Type)
+  .tp_name = "PyView",
+  .tp_basicsize = sizeof(PyView),
+  .tp_itemsize = 0,
+  .tp_dealloc = (destructor)PyView_dealloc,
+  .tp_print = (printfunc)PyView_print,
+  .tp_getattr = (getattrfunc)PyView_getattr,
+  .tp_as_sequence = &ViewAsSeq,
+  .tp_methods = ViewMethods,
 };
-PyTypeObject PyViewertype =  {
-  PyObject_HEAD_INIT(&PyType_Type)0, "PyViewer", sizeof(PyView), 0, (destructor)
-    PyView_dealloc,  /*tp_dealloc*/
-  (printfunc)PyViewer_print,  /*tp_print*/
-  (getattrfunc)PyViewer_getattr,  /*tp_getattr*/
-  0,  /*tp_setattr*/
-  (cmpfunc)0,  /*tp_compare*/
-  (reprfunc)0,  /*tp_repr*/
-  0,  /*tp_as_number*/
-   &ViewerAsSeq,  /*tp_as_sequence*/
-  0,  /*tp_as_mapping*/
+
+PyTypeObject PyViewer_Type = {
+  .ob_base = PyObject_HEAD_INIT(&PyType_Type)
+  .tp_name = "PyViewer",
+  .tp_basicsize = sizeof(PyView),
+  .tp_dealloc = (destructor)PyView_dealloc,
+  .tp_print = (printfunc)PyViewer_print,
+  .tp_getattr = (getattrfunc)PyViewer_getattr,
+  .tp_as_sequence = &ViewerAsSeq,
+  .tp_methods = ViewMethods,
 };
-PyTypeObject PyROViewertype =  {
-  PyObject_HEAD_INIT(&PyType_Type)0, "PyROViewer", sizeof(PyView), 0, 
-    (destructor)PyView_dealloc,  /*tp_dealloc*/
-  (printfunc)PyROViewer_print,  /*tp_print*/
-  (getattrfunc)PyViewer_getattr,  /*tp_getattr*/
-  0,  /*tp_setattr*/
-  (cmpfunc)0,  /*tp_compare*/
-  (reprfunc)0,  /*tp_repr*/
-  0,  /*tp_as_number*/
-   &ViewerAsSeq,  /*tp_as_sequence*/
-  0,  /*tp_as_mapping*/
+
+PyTypeObject PyROViewer_Type = {
+  PyObject_HEAD_INIT(&PyType_Type) "PyROViewer", sizeof(PyView), 0, 
+  .tp_dealloc = (destructor)PyView_dealloc,
+  .tp_print = (printfunc)PyROViewer_print,
+  .tp_getattr = (getattrfunc)PyViewer_getattr,
+  .tp_as_sequence = &ViewerAsSeq,
 };
+
 int PyView::computeState(int targettype) {
   int newtype = _state | targettype;
   if (newtype > FINALNOTIFIABLE)
@@ -1318,16 +1313,16 @@ PyTypeObject *getTypeObject(int type) {
   switch (type) {
     case BASE:
     case MVIEWER:
-      return  &PyViewtype;
+      return  &PyView_Type;
       break;
     case NOTIFIABLE:
     case RWVIEWER:
     case FINALNOTIFIABLE:
-      return  &PyViewertype;
+      return  &PyViewer_Type;
     case ROVIEWER:
-      return  &PyROViewertype;
+      return  &PyROViewer_Type;
   }
-  return  &PyViewtype;
+  return  &PyView_Type;
 }
 
 
@@ -1335,9 +1330,9 @@ PyObject *PyView_new(PyObject *o, PyObject *_args) {
   return new PyView;
 }
 
-PyView::PyView(): PyHead(PyViewtype), _base(0), _state(BASE){}
+PyView::PyView(): PyHead(PyView_Type), _base(0), _state(BASE){}
 
-PyView::PyView(const c4_View &o, PyView *owner, int state): PyHead(PyViewtype),
+PyView::PyView(const c4_View &o, PyView *owner, int state): PyHead(PyView_Type),
   c4_View(o), _base(owner), _state(state) {
   ob_type = getTypeObject(_state);
   if (owner && owner->_base)
@@ -1371,9 +1366,6 @@ void PyView::makeRow(c4_Row &tmp, PyObject *o, bool useDefaults) {
 
     if (!o) {
       pyobject_type = none;
-    } else if (PyInstance_Check(o)) {
-      /* instances of new-style classes (Python 2.2+) do not return true */
-      pyobject_type = instance;
     } else if (PySequence_Check(o)) {
       int seq_length = PyObject_Length(o);
       if (seq_length > n) {
