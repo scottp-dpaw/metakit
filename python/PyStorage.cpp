@@ -333,8 +333,8 @@ static void PyStorage_dealloc(PyStorage *o) {
   delete o;
 }
 
-static int PyStorage_print(PyStorage *o, FILE *f, int) {
-  fprintf(f, "<PyStorage object at %lx>", (long)o);
+PyObject *PyStorage_repr(PyStorage *o) {
+  return PyUnicode_FromFormat("<PyStorage: %lx>", (long)o);
   return 0;
 }
 
@@ -344,7 +344,7 @@ PyTypeObject PyStorage_Type =  {
   .tp_basicsize = sizeof(PyStorage),
   .tp_itemsize = 0,
   .tp_dealloc = (destructor)PyStorage_dealloc,
-  .tp_print = (printfunc)PyStorage_print,
+  .tp_repr = (reprfunc)PyStorage_repr,
   .tp_methods = StorageMethods,
 };
 

@@ -19,14 +19,12 @@ static void PyRowRef_dealloc(PyRowRef *o) {
   delete o;
 }
 
-static int PyRowRef_print(PyRowRef *o, FILE *f, int) {
-  fprintf(f, "<PyRowRef object at %p>", (void*)o);
-  return 0;
+PyObject *PyRowRef_repr(PyRowRef *o) {
+  return PyUnicode_FromFormat("<PyRowRef: %p>", (void*)o);
 }
 
-static int PyRORowRef_print(PyRowRef *o, FILE *f, int) {
-  fprintf(f, "<PyRORowRef object at %p>", (void*)o);
-  return 0;
+PyObject *PyRORowRef_repr(PyRowRef *o) {
+  return PyUnicode_FromFormat("<PyRORowRef: %p>", (void*)o);
 }
 
 static PyObject *PyRowRef_getattr(PyRowRef *o, char *nm) {
@@ -81,9 +79,9 @@ PyTypeObject PyRowRef_Type =  {
   .tp_basicsize = sizeof(PyRowRef),
   .tp_itemsize = 0, 
   .tp_dealloc = (destructor)PyRowRef_dealloc,
-  .tp_print = (printfunc)PyRowRef_print,
   .tp_getattr = (getattrfunc)PyRowRef_getattr,
   .tp_setattr = (setattrfunc)PyRowRef_setattr,
+  .tp_repr = (reprfunc)PyRowRef_repr,
 };
 
 PyTypeObject PyRORowRef_Type =  {
@@ -92,8 +90,8 @@ PyTypeObject PyRORowRef_Type =  {
   .tp_basicsize = sizeof(PyRowRef),
   .tp_itemsize = 0,
   .tp_dealloc = (destructor)PyRowRef_dealloc,
-  .tp_print = (printfunc)PyRORowRef_print,
   .tp_getattr = (getattrfunc)PyRowRef_getattr,
+  .tp_repr = (reprfunc)PyRORowRef_repr,
 };
 
 

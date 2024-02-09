@@ -13,8 +13,8 @@ static void PyProperty_dealloc(PyProperty *o) {
   delete o;
 }
 
-static int PyProperty_print(PyProperty *o, FILE *f, int) {
-  fprintf(f, "Property('%c', '%s')", o->Type(), o->Name());
+PyObject *PyProperty_repr(PyProperty *o) {
+  return PyUnicode_FromFormat("Property('%c', '%s')", o->Type(), o->Name());
   return 0;
 }
 
@@ -64,8 +64,8 @@ PyTypeObject PyProperty_Type = {
   .tp_basicsize = sizeof(PyProperty),
   .tp_itemsize = 0,
   .tp_dealloc = (destructor)PyProperty_dealloc,
-  .tp_print = (printfunc)PyProperty_print,
   .tp_getattr = (getattrfunc)PyProperty_getattr,
+  .tp_repr = (reprfunc)PyProperty_repr,
 };
 
 PyObject *PyProperty_new(PyObject *o, PyObject *_args) {

@@ -1225,19 +1225,16 @@ static void PyView_dealloc(PyView *o) {
   delete o;
 }
 
-static int PyView_print(PyView *o, FILE *f, int) {
-  fprintf(f, "<PyView object at %p>", (void*)o);
-  return 0;
+PyObject *PyView_repr(PyView *o) {
+  return PyUnicode_FromFormat("<PyView: %p>", (void*)o);
 }
 
-static int PyViewer_print(PyView *o, FILE *f, int) {
-  fprintf(f, "<PyViewer object at %p>", (void*)o);
-  return 0;
+PyObject *PyViewer_repr(PyView *o) {
+  return PyUnicode_FromFormat("<PyViewer: %p>", (void*)o);
 }
 
-static int PyROViewer_print(PyView *o, FILE *f, int) {
-  fprintf(f, "<PyROViewer object at %p>", (void*)o);
-  return 0;
+PyObject *PyROViewer_repr(PyView *o) {
+  return PyUnicode_FromFormat("<PyROViewer: %p>", (void*)o);
 }
 
 static PyObject *PyView_getattr(PyView *o, char *nm) {
@@ -1275,8 +1272,8 @@ PyTypeObject PyView_Type = {
   .tp_basicsize = sizeof(PyView),
   .tp_itemsize = 0,
   .tp_dealloc = (destructor)PyView_dealloc,
-  .tp_print = (printfunc)PyView_print,
   .tp_getattr = (getattrfunc)PyView_getattr,
+  .tp_repr = (reprfunc)PyView_repr,
   .tp_as_sequence = &ViewAsSeq,
   .tp_methods = ViewMethods,
 };
@@ -1286,8 +1283,8 @@ PyTypeObject PyViewer_Type = {
   .tp_name = "PyViewer",
   .tp_basicsize = sizeof(PyView),
   .tp_dealloc = (destructor)PyView_dealloc,
-  .tp_print = (printfunc)PyViewer_print,
   .tp_getattr = (getattrfunc)PyViewer_getattr,
+  .tp_repr = (reprfunc)PyViewer_repr,
   .tp_as_sequence = &ViewerAsSeq,
   .tp_methods = ViewMethods,
 };
@@ -1295,8 +1292,8 @@ PyTypeObject PyViewer_Type = {
 PyTypeObject PyROViewer_Type = {
   PyObject_HEAD_INIT(&PyType_Type) "PyROViewer", sizeof(PyView), 0, 
   .tp_dealloc = (destructor)PyView_dealloc,
-  .tp_print = (printfunc)PyROViewer_print,
   .tp_getattr = (getattrfunc)PyViewer_getattr,
+  .tp_repr = (reprfunc)PyROViewer_repr,
   .tp_as_sequence = &ViewerAsSeq,
 };
 
