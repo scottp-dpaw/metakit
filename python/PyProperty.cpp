@@ -18,7 +18,8 @@ PyObject *PyProperty_repr(PyProperty *o) {
   return 0;
 }
 
-static PyObject *PyProperty_getattr(PyProperty *o, char *nm) {
+static PyObject *PyProperty_getattro(PyProperty *o, PyObject *attr) {
+  const char *nm = PyUnicode_AsUTF8(attr);
   try {
     if (nm[0] == 'n' && strcmp(nm, "name") == 0) {
       PWOString rslt(o->Name());
@@ -33,7 +34,7 @@ static PyObject *PyProperty_getattr(PyProperty *o, char *nm) {
       PWONumber rslt(o->GetId());
       return rslt.disOwn();
     }
-    return PyObject_GenericGetAttr(o, PyUnicode_FromString(nm));
+    return PyObject_GenericGetAttr(o, attr);
   } catch (...) {
     return 0;
   }
@@ -64,8 +65,8 @@ PyTypeObject PyProperty_Type = {
   .tp_basicsize = sizeof(PyProperty),
   .tp_itemsize = 0,
   .tp_dealloc = (destructor)PyProperty_dealloc,
-  .tp_getattr = (getattrfunc)PyProperty_getattr,
   .tp_repr = (reprfunc)PyProperty_repr,
+  .tp_getattro = (getattrfunc)PyProperty_getattro,
 };
 
 PyObject *PyProperty_new(PyObject *o, PyObject *_args) {

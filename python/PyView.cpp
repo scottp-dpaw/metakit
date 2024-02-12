@@ -1237,32 +1237,30 @@ PyObject *PyROViewer_repr(PyView *o) {
   return PyUnicode_FromFormat("<PyROViewer: %p>", (void*)o);
 }
 
-static PyObject *PyView_getattr(PyView *o, char *nm) {
+static PyObject *PyView_getattro(PyView *o, PyObject *nm) {
   PyObject *rslt;
   try {
-    PyErr_Clear();
-    int ndx = o->FindPropIndexByName(nm);
+    int ndx = o->FindPropIndexByName(PyUnicode_AsUTF8(nm));
     if (ndx >  - 1)
       return new PyProperty(o->NthProperty(ndx));
-    Fail(PyExc_AttributeError, nm);
+    PyErr_Clear();
+    return PyObject_GenericGetAttr(o, nm);
   } catch (...) {
-    return 0;
+    return NULL;
   }
-  return 0;
 }
 
-static PyObject *PyViewer_getattr(PyView *o, char *nm) {
+static PyObject *PyViewer_getattro(PyView *o, PyObject *nm) {
   PyObject *rslt;
   try {
-    PyErr_Clear();
-    int ndx = o->FindPropIndexByName(nm);
+    int ndx = o->FindPropIndexByName(PyUnicode_AsUTF8(nm));
     if (ndx >  - 1)
       return new PyProperty(o->NthProperty(ndx));
-    Fail(PyExc_AttributeError, nm);
+    PyErr_Clear();
+    return PyObject_GenericGetAttr(o, nm);
   } catch (...) {
-    return 0;
+    return NULL;
   }
-  return 0;
 }
 
 
@@ -1272,9 +1270,9 @@ PyTypeObject PyView_Type = {
   .tp_basicsize = sizeof(PyView),
   .tp_itemsize = 0,
   .tp_dealloc = (destructor)PyView_dealloc,
-  .tp_getattr = (getattrfunc)PyView_getattr,
   .tp_repr = (reprfunc)PyView_repr,
   .tp_as_sequence = &ViewAsSeq,
+  .tp_getattro = (getattrofunc)PyView_getattro,
   .tp_methods = ViewMethods,
 };
 
@@ -1283,18 +1281,18 @@ PyTypeObject PyViewer_Type = {
   .tp_name = "PyViewer",
   .tp_basicsize = sizeof(PyView),
   .tp_dealloc = (destructor)PyView_dealloc,
-  .tp_getattr = (getattrfunc)PyViewer_getattr,
   .tp_repr = (reprfunc)PyViewer_repr,
   .tp_as_sequence = &ViewerAsSeq,
+  .tp_getattro = (getattrofunc)PyViewer_getattro,
   .tp_methods = ViewMethods,
 };
 
 PyTypeObject PyROViewer_Type = {
   PyObject_HEAD_INIT(&PyType_Type) "PyROViewer", sizeof(PyView), 0, 
   .tp_dealloc = (destructor)PyView_dealloc,
-  .tp_getattr = (getattrfunc)PyViewer_getattr,
   .tp_repr = (reprfunc)PyROViewer_repr,
   .tp_as_sequence = &ViewerAsSeq,
+  .tp_getattro = (getattrofunc)PyViewer_getattro,
 };
 
 int PyView::computeState(int targettype) {

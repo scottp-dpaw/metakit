@@ -27,7 +27,8 @@ PyObject *PyRORowRef_repr(PyRowRef *o) {
   return PyUnicode_FromFormat("<PyRORowRef: %p>", (void*)o);
 }
 
-static PyObject *PyRowRef_getattr(PyRowRef *o, char *nm) {
+static PyObject *PyRowRef_getattro(PyRowRef *o, PyObject *attr) {
+  const char *nm = PyUnicode_AsUTF8(attr);
   try {
     if (nm[0] == '_' && nm[1] == '_') {
       if (strcmp(nm, "__attrs__") == 0) {
@@ -45,11 +46,11 @@ static PyObject *PyRowRef_getattr(PyRowRef *o, char *nm) {
       }
     }
 
-    PyObject *attr = o->getPropertyValue(nm);
-    if (attr)
-      return attr;
+    PyObject *val = o->getPropertyValue(nm);
+    if (val)
+      return val;
     PyErr_Clear();
-    return PyObject_GenericGetAttr((PyObject*)o, PyUnicode_FromString(nm));
+    return PyObject_GenericGetAttr((PyObject*)o, attr);
   } catch (...) {
     return NULL;
   }
@@ -79,9 +80,9 @@ PyTypeObject PyRowRef_Type =  {
   .tp_basicsize = sizeof(PyRowRef),
   .tp_itemsize = 0, 
   .tp_dealloc = (destructor)PyRowRef_dealloc,
-  .tp_getattr = (getattrfunc)PyRowRef_getattr,
   .tp_setattr = (setattrfunc)PyRowRef_setattr,
   .tp_repr = (reprfunc)PyRowRef_repr,
+  .tp_getattro = (getattrofunc)PyRowRef_getattro,
 };
 
 PyTypeObject PyRORowRef_Type =  {
@@ -90,8 +91,8 @@ PyTypeObject PyRORowRef_Type =  {
   .tp_basicsize = sizeof(PyRowRef),
   .tp_itemsize = 0,
   .tp_dealloc = (destructor)PyRowRef_dealloc,
-  .tp_getattr = (getattrfunc)PyRowRef_getattr,
   .tp_repr = (reprfunc)PyRORowRef_repr,
+  .tp_getattro = (getattrofunc)PyRowRef_getattro,
 };
 
 

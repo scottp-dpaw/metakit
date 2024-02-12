@@ -14,12 +14,13 @@ class PyHead: public PyObject {
   public:
     PyHead(PyTypeObject &t) {
 #ifdef Py_TRACE_REFS
-        _ob_next = 0;
-        _ob_prev = 0;
-        _Py_AddToAllObjects(this, 0);
+//        _ob_next = 0;
+//        _ob_prev = 0;
+//        _Py_AddToAllObjects(this, 0);
 #endif 
         ob_refcnt = 1;
         ob_type = &t;
+        PyObject_INIT(this, &t);
     }
 };
 
