@@ -136,7 +136,7 @@
 				RelativePath="..\..\python\scxx\PWOImp.cpp">
 			</File>
 			<File
-				RelativePath="..\..\python\PyProperty.cpp">
+				RelativePath="..\..\python\PyPropRef.cpp">
 			</File>
 			<File
 				RelativePath="..\..\python\PyRowRef.cpp">
@@ -170,7 +170,7 @@
 				RelativePath="..\..\python\PyHead.h">
 			</File>
 			<File
-				RelativePath="..\..\python\PyProperty.h">
+				RelativePath="..\..\python\PyPropRef.h">
 			</File>
 			<File
 				RelativePath="..\..\python\PyRowRef.h">

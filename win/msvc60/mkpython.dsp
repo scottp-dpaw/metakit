@@ -100,7 +100,7 @@ SOURCE=..\..\python\scxx\PWOImp.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\python\PyProperty.cpp
+SOURCE=..\..\python\PyPropRef.cpp
 # End Source File
 # Begin Source File
 
@@ -144,7 +144,7 @@ SOURCE=..\..\python\PyHead.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\python\PyProperty.h
+SOURCE=..\..\python\PyPropRef.h
 # End Source File
 # Begin Source File
 

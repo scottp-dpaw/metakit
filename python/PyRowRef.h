@@ -12,7 +12,7 @@
 #include "PyHead.h"
 #include <PWOSequence.h>
 #include "PyView.h"
-#include "PyProperty.h"
+#include "PyPropRef.h"
 
 #define PyRowRef_Check(ob) ((ob)->ob_type == &PyRowRef_Type)
 #define PyRORowRef_Check(ob) ((ob)->ob_type == &PyRORowRef_Type)
@@ -30,17 +30,17 @@ class PyRowRef: public PyHead, public c4_RowRef {
         c4_Cursor c = &(*(c4_RowRef*)this);
         c._seq->DecRef();
     }
-    PyProperty *getProperty(char *nm) {
+    PyPropRef *getProperty(const char *nm) {
         c4_View cntr = Container();
         int ndx = cntr.FindPropIndexByName(nm);
         if (ndx >  - 1) {
-            return new PyProperty(cntr.NthProperty(ndx));
+            return new PyPropRef(cntr.NthProperty(ndx));
         }
         return 0;
     };
 
-    PyObject *getPropertyValue(char *nm) {
-        PyProperty *prop = getProperty(nm);
+    PyObject *getPropertyValue(const char *nm) {
+        PyPropRef *prop = getProperty(nm);
         if (prop) {
             PyObject *result = asPython(*prop);
             Py_DECREF(prop);

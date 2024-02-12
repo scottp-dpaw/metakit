@@ -8,7 +8,7 @@ LOBJS =   column.o custom.o derived.o fileio.o field.o format.o \
           handler.o persist.o remap.o std.o store.o string.o table.o \
 	  univ.o view.o viewx.o
 
-PYOBJS  = PyProperty.o PyRowRef.o PyStorage.o PyView.o PWOImp.o
+PYOBJS  = PyPropRef.o PyRowRef.o PyStorage.o PyView.o PWOImp.o
 
 TSTOBJS = regress.o tbasic1.o tbasic2.o tcusto1.o tcusto2.o tdiffer.o \
 	  textend.o tformat.o tlimits.o tmapped.o tnotify.o tresize.o \
@@ -185,7 +185,7 @@ mk4tcl.o: $(srcdir)/../tcl/mk4tcl.cpp
 mk4too.o: $(srcdir)/../tcl/mk4too.cpp
 	$(CXX) -c $(CXX_SWITCHES_TCL) $?
 
-PyProperty.o: $(srcdir)/../python/PyProperty.cpp
+PyPropRef.o: $(srcdir)/../python/PyPropRef.cpp
 	$(CXX) -c $(CXX_SWITCHES_PY) $?
 PyRowRef.o: $(srcdir)/../python/PyRowRef.cpp
 	$(CXX) -c $(CXX_SWITCHES_PY) $?

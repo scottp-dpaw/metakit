@@ -36,7 +36,7 @@ static PyObject *PyRowRef_getattro(PyRowRef *o, PyObject *attr) {
         int nprops = parent.NumProperties();
         PyObject *out = PyList_New(nprops);
         for (int i = 0; i < nprops; i++) {
-          PyList_SetItem(out, i, new PyProperty(parent.NthProperty(i)));
+          PyList_SetItem(out, i, new PyPropRef(parent.NthProperty(i)));
         }
         return out;
       } else if (strcmp(nm, "__view__") == 0) {
@@ -58,7 +58,7 @@ static PyObject *PyRowRef_getattro(PyRowRef *o, PyObject *attr) {
 
 static int PyRowRef_setattr(PyRowRef *o, char *nm, PyObject *v) {
   try {
-    PyProperty *p = o->getProperty(nm);
+    PyPropRef *p = o->getProperty(nm);
     if (p) {
       if (v)
         PyRowRef::setFromPython(*o,  *p, v);

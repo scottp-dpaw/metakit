@@ -7,7 +7,7 @@
 //  setsize method added by J. Barnard
 
 #include "PyView.h"
-#include "PyProperty.h"
+#include "PyPropRef.h"
 #include "PyRowRef.h"
 #include <PWOMSequence.h>
 #include <PWONumber.h>
@@ -144,9 +144,9 @@ static PyObject *PyView_addproperty(PyView *o, PyObject *_args) {
   try {
     PWOSequence args(_args);
     PWOBase prop(args[0]);
-    if (!PyProperty_Check((PyObject*)prop))
+    if (!PyPropRef_Check((PyObject*)prop))
       Fail(PyExc_TypeError, "Not a Property object");
-    PWONumber rslt(o->AddProperty(*(PyProperty*)(PyObject*)prop));
+    PWONumber rslt(o->AddProperty(*(PyPropRef*)(PyObject*)prop));
     return rslt.disOwn();
   } catch (...) {
     return 0;
@@ -249,10 +249,10 @@ static PyObject *PyView_flatten(PyView *o, PyObject *_args, PyObject *_kwargs) {
     PWOMapping kwargs;
     if (_kwargs)
       kwargs = PWOBase(_kwargs);
-    if (!PyProperty_Check((PyObject*)args[0]))
+    if (!PyPropRef_Check((PyObject*)args[0]))
       Fail(PyExc_TypeError, 
         "First arg must be a property object identifying the subview");
-    const c4_Property &subview = *(PyProperty*)(PyObject*)args[0];
+    const c4_Property &subview = *(PyPropRef*)(PyObject*)args[0];
     bool outer = false;
     if (args.len() > 1) {
       PWONumber flag(args[1]);
@@ -610,10 +610,10 @@ static const char *access__doc =
 static PyObject *PyView_access(PyView *o, PyObject *_args) {
   try {
     PWOSequence args(_args);
-    if (!PyProperty_Check((PyObject*)args[0]))
+    if (!PyPropRef_Check((PyObject*)args[0]))
       Fail(PyExc_TypeError, "First arg must be a property");
 
-    c4_BytesProp &prop = *(c4_BytesProp*)(c4_Property*)(PyProperty*)(PyObject*)
+    c4_BytesProp &prop = *(c4_BytesProp*)(c4_Property*)(PyPropRef*)(PyObject*)
       args[0];
 
     int index = PyLong_AsLong(args[1]);
@@ -657,10 +657,10 @@ static const char *modify__doc =
 static PyObject *PyView_modify(PyView *o, PyObject *_args) {
   try {
     PWOSequence args(_args);
-    if (!PyProperty_Check((PyObject*)args[0]))
+    if (!PyPropRef_Check((PyObject*)args[0]))
       Fail(PyExc_TypeError, "First arg must be a property");
 
-    c4_BytesProp &prop = *(c4_BytesProp*)(c4_Property*)(PyProperty*)(PyObject*)
+    c4_BytesProp &prop = *(c4_BytesProp*)(c4_Property*)(PyPropRef*)(PyObject*)
       args[0];
 
     int index = PWONumber(args[1]);
@@ -691,10 +691,10 @@ static const char *itemsize__doc =
 static PyObject *PyView_itemsize(PyView *o, PyObject *_args) {
   try {
     PWOSequence args(_args);
-    if (!PyProperty_Check((PyObject*)args[0]))
+    if (!PyPropRef_Check((PyObject*)args[0]))
       Fail(PyExc_TypeError, "First arg must be a property");
 
-    c4_BytesProp &prop = *(c4_BytesProp*)(c4_Property*)(PyProperty*)(PyObject*)
+    c4_BytesProp &prop = *(c4_BytesProp*)(c4_Property*)(PyPropRef*)(PyObject*)
       args[0];
     int index = args.len() == 1 ? 0 : (int)PWONumber(args[1]);
     if (index < 0 || index >= o->GetSize())
@@ -1242,7 +1242,7 @@ static PyObject *PyView_getattro(PyView *o, PyObject *nm) {
   try {
     int ndx = o->FindPropIndexByName(PyUnicode_AsUTF8(nm));
     if (ndx >  - 1)
-      return new PyProperty(o->NthProperty(ndx));
+      return new PyPropRef(o->NthProperty(ndx));
     PyErr_Clear();
     return PyObject_GenericGetAttr(o, nm);
   } catch (...) {
@@ -1255,7 +1255,7 @@ static PyObject *PyViewer_getattro(PyView *o, PyObject *nm) {
   try {
     int ndx = o->FindPropIndexByName(PyUnicode_AsUTF8(nm));
     if (ndx >  - 1)
-      return new PyProperty(o->NthProperty(ndx));
+      return new PyPropRef(o->NthProperty(ndx));
     PyErr_Clear();
     return PyObject_GenericGetAttr(o, nm);
   } catch (...) {
@@ -1427,11 +1427,11 @@ PyObject *PyView::structure() {
   int n = NumProperties();
   //  PyObject* list=PyList_New(n);
   //  for (int i = 0; i < n; i++)
-  //    PyList_SET_ITEM(list, i, new PyProperty(NthProperty(i)));
+  //    PyList_SET_ITEM(list, i, new PyPropRef(NthProperty(i)));
   //  return list;
   PWOList rslt(n);
   for (int i = 0; i < n; i++) {
-    PyProperty *prop = new PyProperty(NthProperty(i));
+    PyPropRef *prop = new PyPropRef(NthProperty(i));
     rslt.setItem(i, prop);
   }
   return rslt.disOwn();
@@ -1442,7 +1442,7 @@ PyObject *PyView::properties() {
   int n = NumProperties();
   PWOMapping rslt;
   for (int i = 0; i < n; i++) {
-    PyProperty *item = new PyProperty(NthProperty(i));
+    PyPropRef *item = new PyPropRef(NthProperty(i));
     rslt.setItem(item->Name(), item);
     Py_DECREF(item);
   }
@@ -1515,8 +1515,8 @@ int PyView::setItem(int i, PyObject *v) {
 
 void PyView::addProperties(const PWOSequence &lst) {
   for (int i = 0; i < lst.len(); i++) {
-    if (PyProperty_Check((PyObject*)lst[i])) {
-      AddProperty(*(PyProperty*)(PyObject*)lst[i]);
+    if (PyPropRef_Check((PyObject*)lst[i])) {
+      AddProperty(*(PyPropRef*)(PyObject*)lst[i]);
     }
   }
 }

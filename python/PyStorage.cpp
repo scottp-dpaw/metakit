@@ -10,7 +10,7 @@
 #include <PWOSequence.h>
 #include <PWONumber.h>
 #include "PyView.h"
-#include "PyProperty.h"
+#include "PyPropRef.h"
 #include "PyRowRef.h"
 #include "mk4str.h"
 #include "mk4io.h"
@@ -367,9 +367,9 @@ static PyObject *PyStorage_new(PyObject *o, PyObject *_args) {
           if (!PyView_Check((PyObject*)args[1]))
             Fail(PyExc_TypeError, "Second arg must be a view object");
           c4_View &view = *(PyView*)(PyObject*)args[1];
-          if (!PyProperty_Check((PyObject*)args[2]))
+          if (!PyPropRef_Check((PyObject*)args[2]))
             Fail(PyExc_TypeError, "Third arg must be a property object");
-          c4_BytesProp &prop = *(c4_BytesProp*)(c4_Property*)(PyProperty*)
+          c4_BytesProp &prop = *(c4_BytesProp*)(c4_Property*)(PyPropRef*)
             (PyObject*)args[2];
           int row = PWONumber(args[3]);
 
@@ -490,7 +490,7 @@ static PyObject *PyView_wrap(PyObject *o, PyObject *_args) {
 
     c4_View templ;
     for (int i = 0; i < types.len(); ++i) {
-      const c4_Property &prop = *(PyProperty*)(PyObject*)types[i];
+      const c4_Property &prop = *(PyPropRef*)(PyObject*)types[i];
       templ.AddProperty(prop);
     }
 
@@ -509,7 +509,7 @@ static PyMethodDef Mk4Methods[] =  {
     "storage", PyStorage_new, METH_VARARGS, storage__doc
   }
   ,  {
-    "property", PyProperty_new, METH_VARARGS, 
+    "property", PyPropRef_new, METH_VARARGS, 
       "property(type, name) -- create a property of given type and name"
   }
   ,  {
@@ -543,11 +543,11 @@ PyMODINIT_FUNC PyInit_Mk4py() {
     return NULL;
   }
 
-  if (PyType_Ready(&PyProperty_Type) < 0)
+  if (PyType_Ready(&PyPropRef_Type) < 0)
     return NULL;
-  Py_INCREF(&PyProperty_Type);
-  if (PyModule_AddObject(m, "PropertyType", (PyObject *) &PyProperty_Type) < 0) {
-    Py_DECREF(&PyProperty_Type);
+  Py_INCREF(&PyPropRef_Type);
+  if (PyModule_AddObject(m, "PropertyType", (PyObject *) &PyPropRef_Type) < 0) {
+    Py_DECREF(&PyPropRef_Type);
     Py_DECREF(m);
     return NULL;
   }
